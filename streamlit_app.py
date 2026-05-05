@@ -282,7 +282,11 @@ if not data:
 
 songs = data["songs"]
 analysis = data["analysis"]
-analyzed_count = data.get("analyzed_count", len(songs))
+import re as _re
+analyzed_count = data.get("analyzed_count")
+if analyzed_count is None:
+    _m = _re.search(r'analysis of (\d+)', analysis.get("executive_summary", ""))
+    analyzed_count = int(_m.group(1)) if _m else len(songs)
 categories = analysis["emotional_analysis"]["categories"]
 
 # ── Hero ─────────────────────────────────────────────────────────────────────
