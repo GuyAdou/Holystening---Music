@@ -1,0 +1,14 @@
+.env
+*.env
+.DS_Store
+logs/
+.idea/
+__pycache__/
+.venv/
+*.pyc
+Holystening/.ipynb_checkpoints/
+Holystening/christian_music_analysis.*
+Holystening/test_analysis.*
+Holystening/analysis_chart.png
+Holystening/emotional_themes.png
+config/airflow.cfg

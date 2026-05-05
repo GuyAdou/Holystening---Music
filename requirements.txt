@@ -1,0 +1,5 @@
+streamlit
+plotly
+requests
+google-cloud-storage
+google-auth
