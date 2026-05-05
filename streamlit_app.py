@@ -258,7 +258,11 @@ def load_latest_data():
     blobs = sorted(bucket.list_blobs(prefix="christian_songs_"), key=lambda b: b.name, reverse=True)
     if not blobs:
         return None
-    return json.loads(blobs[0].download_as_text())
+    for blob in blobs:
+        data = json.loads(blob.download_as_text())
+        if data.get("songs") and len(data["songs"]) > 0:
+            return data
+    return None
 
 
 @st.cache_data(ttl=86400)
