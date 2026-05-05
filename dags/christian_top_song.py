@@ -9,7 +9,7 @@ from airflow.decorators import dag, task
 from airflow.models import Variable
 
 
-@dag(schedule="0 6 * * *", start_date=datetime(2024, 1, 1), catchup=False)
+@dag(schedule="0 6 * * 1", start_date=datetime(2024, 1, 1), catchup=False)
 def christian_top_songs():
 
     @task()
