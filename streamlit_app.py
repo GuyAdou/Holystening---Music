@@ -282,6 +282,7 @@ if not data:
 
 songs = data["songs"]
 analysis = data["analysis"]
+analyzed_count = data.get("analyzed_count", len(songs))
 categories = analysis["emotional_analysis"]["categories"]
 
 # ── Hero ─────────────────────────────────────────────────────────────────────
@@ -305,7 +306,7 @@ st.markdown(f"""
 top_cat = max(categories, key=lambda c: c["percentage"])
 
 stats = [
-    (len(songs), "Songs Tracked"),
+    (analyzed_count, "Songs Analyzed"),
     (len(categories), "Emotional Themes"),
     (top_cat["name"], f"Top Theme · {top_cat['percentage']}%"),
 ]

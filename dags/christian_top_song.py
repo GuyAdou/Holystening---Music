@@ -143,7 +143,7 @@ SONGS:
         analysis = json.loads(response_text.strip())
         print(f"Analysis complete: {analysis['executive_summary']}")
 
-        return {"songs": songs, "analysis": analysis}
+        return {"songs": songs, "analyzed_count": analyze_count, "analysis": analysis}
 
     @task()
     def store_to_gcs(payload):
