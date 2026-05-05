@@ -69,6 +69,8 @@ def christian_top_songs():
 
                 has_error = lyrics_data.get("error")
                 has_data = "data" in lyrics_data and lyrics_data["data"]
+                if attempted == 1:
+                    print(f"  DEBUG first response: {json.dumps(lyrics_data)[:500]}")
                 print(f"  [{attempted}] {song['title']} — error={has_error}, has_data={has_data}")
 
                 if has_error == False and has_data:
