@@ -27,6 +27,8 @@ Spotify playlist → lyrics → Llama 3.1 → GCS → Streamlit
 ---
 
 ## Dashboard
+<img width="1487" height="729" alt="image" src="https://github.com/user-attachments/assets/d0343297-469f-4772-9e7b-2e34fae120fb" />
+
 
 Built with Streamlit and Plotly. Reads directly from GCS on load (cached for 1 hour).
 
@@ -35,6 +37,8 @@ Built with Streamlit and Plotly. Reads directly from GCS on load (cached for 1 h
 - **Bar chart** — emotional theme breakdown by percentage
 - **Insights panel** — listener profile and strongest evidence-backed claim with confidence level
 - **Song grid** — top 20 tracks with Spotify cover art and first lyric line
+
+<img width="1419" height="873" alt="image" src="https://github.com/user-attachments/assets/bb5cbb37-91bf-497c-8676-a286b795d8f4" />
 
 ---
 
