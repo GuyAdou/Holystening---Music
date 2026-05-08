@@ -55,6 +55,13 @@ Built with Streamlit and Plotly. Reads directly from GCS on load (cached for 1 h
 
 ---
 
+## Next steps
+
+- Fetch the full playlist (100+ songs) instead of capping at 50
+- Switch LLM inference from Groq to Vertex AI (Gemini 2.5 Flash) to stay within the GCP ecosystem and support larger lyric batches
+
+---
+
 ## Disclaimer
 
 This project is built for educational and portfolio purposes only. Lyrics are fetched via third-party APIs and used solely as input for sentiment analysis — they are not stored long-term, displayed, or reproduced in any output. No commercial use is intended. All song lyrics remain the property of their respective copyright holders.
