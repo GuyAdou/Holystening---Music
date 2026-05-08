@@ -1,6 +1,6 @@
 # Holystening
 
-A weekly data pipeline that tracks what Christian music people are actually streaming on Spotify — pulls songs, grabs lyrics, runs LLM sentiment analysis, and surfaces the results in a dashboard.
+A weekly data pipeline that tracks the state of Christian on Spotify. It pulls songs, grabs lyrics, runs LLM sentiment analysis, and surfaces the results in a dashboard.
 
 ---
 
@@ -9,10 +9,10 @@ A weekly data pipeline that tracks what Christian music people are actually stre
 The pipeline runs every Monday morning via Apache Airflow and goes through four steps:
 
 **1. Fetch top songs**
-Pulls the top 50 tracks from a curated Christian Spotify playlist using the RapidAPI Spotify endpoint. Songs are ranked by popularity score.
+Pulls the top 50 tracks from "Top Christian & Gospel" Spotify playlist using the RapidAPI Spotify endpoint. Songs are ranked by popularity score.
 
 **2. Fetch lyrics**
-For each song, queries the Musixmatch API (also via RapidAPI) to retrieve lyrics. Targets 30 songs with valid lyrics — skips instrumentals or tracks where lyrics aren't available.
+For each song, queries the Musixmatch API to retrieve lyrics. Targets 30 songs with valid lyrics, skipping instrumentals or tracks where lyrics aren't available.
 
 **3. Sentiment analysis**
 Sends all the lyrics together in a single prompt to Llama 3.1 (via Groq). The model returns structured JSON with emotional theme categories, percentages, an executive summary, the strongest evidence-backed claim, and a listener profile inference.
