@@ -55,6 +55,12 @@ Built with Streamlit and Plotly. Reads directly from GCS on load (cached for 1 h
 
 ---
 
+## Disclaimer
+
+This project is built for educational and portfolio purposes only. Lyrics are fetched via third-party APIs and used solely as input for sentiment analysis — they are not stored long-term, displayed, or reproduced in any output. No commercial use is intended. All song lyrics remain the property of their respective copyright holders.
+
+---
+
 ## Project structure
 
 ```
