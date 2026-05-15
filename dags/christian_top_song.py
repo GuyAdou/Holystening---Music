@@ -44,7 +44,10 @@ def christian_top_songs():
 
     @task()
     def fetch_lyrics(songs):
-        rapidapi_key = Variable.get("RAPIDAPI_KEY")
+        import requests
+        from bs4 import BeautifulSoup
+
+        genius_token = Variable.get("GENIUS_ACCESS_TOKEN")
         results = []
         target = 100
         attempted = 0
@@ -56,34 +59,39 @@ def christian_top_songs():
                 break
             attempted += 1
             try:
-                conn = http.client.HTTPSConnection("spotify-web-api3.p.rapidapi.com")
-                headers = {
-                    'x-rapidapi-key': rapidapi_key,
-                    'x-rapidapi-host': "spotify-web-api3.p.rapidapi.com"
-                }
-                terms = urllib.parse.quote(song["title"])
-                artist = urllib.parse.quote(song["artist"])
-                conn.request("GET", f"/v1/social/spotify/musixmatchsearchlyrics?terms={terms}&artist={artist}", headers=headers)
-                res = conn.getresponse()
-                lyrics_data = json.loads(res.read().decode("utf-8"))
+                # Search Genius for the song
+                query = urllib.parse.quote(f"{song['title']} {song['artist']}")
+                headers = {"Authorization": f"Bearer {genius_token}"}
+                search = requests.get(f"https://api.genius.com/search?q={query}", headers=headers, timeout=5)
+                hits = search.json().get("response", {}).get("hits", [])
 
-                has_error = lyrics_data.get("error")
-                has_data = "data" in lyrics_data and lyrics_data["data"]
-                if attempted == 1:
-                    print(f"  DEBUG first response: {json.dumps(lyrics_data)[:500]}")
-                print(f"  [{attempted}] {song['title']} — error={has_error}, has_data={has_data}")
+                if not hits:
+                    print(f"  ✗ [{attempted}] {song['title']} — not found on Genius")
+                    continue
 
-                if has_error == False and has_data:
-                    lines = [
-                        re.sub(r'^\[\d{2}:\d{2}\.\d{2}\]', '', line).strip()
-                        for line in lyrics_data["data"]
-                        if line and line.strip() and line.strip() != '♪'
-                    ]
-                    if lines:
-                        song["lyrics"] = '\n'.join(lines)
-                        song["lyrics_first_line"] = lines[0]
-                        results.append(song)
-                        print(f"  ✓ [{len(results)}/{target}] {song['title']}")
+                song_url = hits[0]["result"]["url"]
+                page = requests.get(song_url, timeout=10)
+                soup = BeautifulSoup(page.text, "html.parser")
+
+                containers = soup.find_all("div", attrs={"data-lyrics-container": "true"})
+                if not containers:
+                    print(f"  ✗ [{attempted}] {song['title']} — lyrics container not found")
+                    continue
+
+                lines = []
+                for container in containers:
+                    for br in container.find_all("br"):
+                        br.replace_with("\n")
+                    text = container.get_text(separator="\n")
+                    lines.extend([l.strip() for l in text.split("\n") if l.strip()])
+
+                if lines:
+                    song["lyrics"] = '\n'.join(lines)
+                    song["lyrics_first_line"] = lines[0]
+                    results.append(song)
+                    print(f"  ✓ [{len(results)}/{target}] {song['title']}")
+                else:
+                    print(f"  ✗ [{attempted}] {song['title']} — empty lyrics")
 
                 time.sleep(0.5)
             except Exception as e:
