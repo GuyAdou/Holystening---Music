@@ -46,7 +46,7 @@ def christian_top_songs():
     def fetch_lyrics(songs):
         rapidapi_key = Variable.get("RAPIDAPI_KEY")
         results = []
-        target = 30
+        target = 100
         attempted = 0
 
         print(f"Starting lyrics fetch. Input: {len(songs)} songs, target: {target}")
@@ -98,7 +98,7 @@ def christian_top_songs():
 
         client = Groq(api_key=Variable.get("GROQ_API_KEY"))
 
-        analyze_count = min(len(songs), 25)
+        analyze_count = min(len(songs), 100)
         print(f"analyze_sentiment received {len(songs)} songs, analyzing {analyze_count}")
 
         songs_text = "\n\n".join([
