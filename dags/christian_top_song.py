@@ -113,9 +113,19 @@ def christian_top_songs():
 
     @task()
     def analyze_sentiment(songs):
-        from groq import Groq
+        import tempfile
+        import google.auth
+        from google.oauth2 import service_account
+        import vertexai
+        from vertexai.generative_models import GenerativeModel, GenerationConfig
 
-        client = Groq(api_key=Variable.get("GROQ_API_KEY"))
+        key_json = Variable.get("GCP_SERVICE_ACCOUNT_KEY")
+        key_dict = json.loads(key_json)
+        credentials = service_account.Credentials.from_service_account_info(
+            key_dict,
+            scopes=["https://www.googleapis.com/auth/cloud-platform"]
+        )
+        vertexai.init(project="holystening-pipeline", location="us-central1", credentials=credentials)
 
         analyze_count = min(len(songs), 100)
         print(f"analyze_sentiment received {len(songs)} songs, analyzing {analyze_count}")
@@ -146,14 +156,13 @@ def christian_top_songs():
 SONGS:
 {songs_text}"""
 
-        response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3,
-            max_tokens=4000
+        model = GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(
+            prompt,
+            generation_config=GenerationConfig(temperature=0.3, max_output_tokens=8192)
         )
 
-        response_text = response.choices[0].message.content
+        response_text = response.text
         if "```" in response_text:
             response_text = response_text.split("```")[1]
             if response_text.startswith("json"):

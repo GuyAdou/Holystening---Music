@@ -285,9 +285,14 @@ analysis = data["analysis"]
 import re as _re
 analyzed_count = data.get("analyzed_count")
 if analyzed_count is None:
-    _m = _re.search(r'analysis of (\d+)', analysis.get("executive_summary", ""))
+    _m = _re.search(r'analysis of (\d+)', analysis.get("executive_summary", analysis.get("headline_finding", "")))
     analyzed_count = int(_m.group(1)) if _m else len(songs)
 categories = analysis["emotional_analysis"]["categories"]
+summary_text = analysis.get("headline_finding") or analysis.get("executive_summary", "")
+notable_patterns = analysis.get("notable_patterns", [])
+lyrics_address = analysis.get("what_the_lyrics_address") or analysis.get("listener_profile", {}).get("evidence_based_inference", "")
+artist_note = analysis.get("artist_concentration_note")
+data_limitations = analysis.get("data_limitations", [])
 
 # ── Hero ─────────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -302,7 +307,7 @@ st.markdown("""
 st.markdown(f"""
 <div class="summary-card">
     <div class="summary-label">Key Finding</div>
-    <div class="summary-text">{analysis['executive_summary']}</div>
+    <div class="summary-text">{summary_text}</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -362,22 +367,37 @@ with left:
     st.plotly_chart(fig, use_container_width=True)
 
 with right:
-    st.markdown('<div class="section-title">Insights</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Patterns</div>', unsafe_allow_html=True)
 
-    profile = analysis["listener_profile"]["evidence_based_inference"]
-    claim = analysis["strongest_evidence_backed_claim"]
+    if lyrics_address:
+        st.markdown(f"""
+        <div class="insight-card" style="margin-bottom:16px">
+            <div class="insight-label">What These Lyrics Address</div>
+            <div class="insight-text">{lyrics_address}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown(f"""
-    <div class="insight-card" style="margin-bottom:16px">
-        <div class="insight-label">Who's Listening</div>
-        <div class="insight-text">{profile}</div>
-    </div>
-    <div class="insight-card">
-        <div class="insight-label">Strongest Signal</div>
-        <div class="insight-text">{claim['claim']}<br/><br/><span style="color:#3a3a3c;font-size:13px">{claim['evidence']}</span></div>
-        <div class="confidence-badge">Confidence · {claim['confidence']}</div>
-    </div>
-    """, unsafe_allow_html=True)
+    for p in notable_patterns[:2]:
+        caveat_html = f'<div style="color:#aeaeb2;font-size:12px;margin-top:10px">⚠ {p["caveat"]}</div>' if p.get("caveat") else ""
+        songs_html = "".join([f'<div style="color:#6e6e73;font-size:12px;margin-top:4px">· {s}</div>' for s in p.get("supporting_songs", [])[:3]])
+        quote_html = f'<div style="font-style:italic;color:#aeaeb2;font-size:12px;margin-top:10px">"{p["supporting_quote"]}"</div>' if p.get("supporting_quote") else ""
+        st.markdown(f"""
+        <div class="insight-card" style="margin-bottom:16px">
+            <div class="insight-label">Pattern</div>
+            <div class="insight-text">{p["pattern"]}</div>
+            {songs_html}
+            {quote_html}
+            {caveat_html}
+        </div>
+        """, unsafe_allow_html=True)
+
+    if artist_note:
+        st.markdown(f"""
+        <div class="insight-card" style="margin-bottom:16px;border-color:rgba(255,200,100,0.4)">
+            <div class="insight-label">Artist Concentration</div>
+            <div class="insight-text" style="font-size:13px">{artist_note}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
 st.markdown('<hr class="apple-divider">', unsafe_allow_html=True)
 
